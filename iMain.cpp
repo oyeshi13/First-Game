@@ -359,8 +359,6 @@ void iSpecialKeyboard(unsigned char key)
 {
     switch (key)
     {
-    case GLUT_KEY_F2:
-    levels=2; 
     case GLUT_KEY_LEFT:
     //game_state=2;
     isStanding=false;
