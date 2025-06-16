@@ -134,9 +134,10 @@ void platform_collision(){
     int minnieFeetY = minnieY+minnie_jump;
     if(minnieFeetX2 >= platform4X && minnieFeetX1 <= platform4X + obstacle2_width){
         if(minnieFeetY >= platform4Y + obstacle2_height &&!jumpUp) {
-            //minnie_jump=0;
             // minnieY = platform4Y + obstacle2_height-minnie_jump;
             onPlatform4 = true;
+            // isJumping=false;
+            // minnie_jump=0;
             onPlatform1=onPlatform2=onPlatform3=onPlatform6=onPlatform5=false;
         }
     }
@@ -213,7 +214,7 @@ void update_running(){
         minnieY=platform2Y+obstacle2_height-31;
         minnieX+=dx*dx2;
     }
-    else if(!onPlatform1&&!onPlatform2&&!onPlatform3&&!onPlatform4&&!onPlatform5&&!onPlatform6&&!isJumping){
+    else if(!onPlatform1&&!onPlatform2&&!onPlatform3&&!onPlatform4&&!onPlatform5&&!onPlatform6){
         minnieY-=10;
         if(minnieY<=150){
             minnieY=150;
@@ -431,9 +432,9 @@ int main(int argc, char *argv[])
     //iSetTimer(150,update_running);
     // if(game_state==2){
     iSetTimer(45,update_jump);
-    iSetTimer(50,change_obstacle);
-    iSetTimer(50,update_running);
-    iSetTimer(50,platform_collision);
+    iSetTimer(30,change_obstacle);
+    iSetTimer(30,update_running);
+    iSetTimer(30,platform_collision);
     // place your own initialization codes here.
     iInitializeSound();
     iInitialize(1200, 900, "MY GAME");
