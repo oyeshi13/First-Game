@@ -10,7 +10,7 @@ int timer3 = 40;
 int timer4 = 30;
 int timer5 = 25;
 int scoreLeft = 1010;
-Image menu, leaderboard, help, obstacle_1, obstacle_2, player_name, gameover, diamond,level_comp;
+Image menu, leaderboard, help, obstacle_1, obstacle_2, player_name, gameover, diamond, level_comp;
 // char minnie_idle[2][100]={"assets/images/idle/1.png","assets/images/idle/2.png"};
 char minnie_running[6][100] = {"assets/images/My Game/minnie_running/tile000.png", "assets/images/My Game/minnie_running/tile001.png", "assets/images/My Game/minnie_running/tile002.png", "assets/images/My Game/minnie_running/tile003.png", "assets/images/My Game/minnie_running/tile004.png", "assets/images/My Game/minnie_running/tile005.png"};
 char minnie_jumping[6][100] = {"assets/images/My Game/minnie_jumping/jumping000.png", "assets/images/My Game/minnie_jumping/jumping001.png", "assets/images/My Game/minnie_jumping/jumping002.png", "assets/images/My Game/minnie_jumping/jumping003.png", "assets/images/My Game/minnie_jumping/jumping004.png", "assets/images/My Game/minnie_jumping/jumping005.png"};
@@ -64,12 +64,12 @@ bool gameOver = false;
 char timer[100];
 char score[100];
 int count = 0;
-int diamondX=1050;
-int diamondY=650;
-int diamond_width=70;
-int diamond_height=100;
-bool level_complete=false;
-bool show_diamond=true;
+int diamondX = 1050;
+int diamondY = 650;
+int diamond_width = 70;
+int diamond_height = 100;
+bool level_complete = false;
+bool show_diamond = true;
 // int minnie_jump_idx=0;
 /*
 function iDraw() is called again and again by the system.
@@ -85,7 +85,7 @@ void load_image()
     iLoadImage(&obstacle_2, "assets/images/My Game/obstacle_2.png");
     iLoadImage(&gameover, "assets/images/My Game/Game_over.png");
     iLoadImage(&diamond, "assets/images/My Game/diamond.png");
-    iLoadImage(&level_comp,"assets/images/My Game/level_complete.jpg");
+    iLoadImage(&level_comp, "assets/images/My Game/level_complete.jpg");
 }
 
 void iDraw()
@@ -126,7 +126,8 @@ void iDraw()
                     iShowImage(platform4X, platform4Y, "assets/images/My Game/obstacle_2.png");
                     iShowImage(platform5X, platform5Y, "assets/images/My Game/obstacle_2.png");
                     iShowImage(platform6X, platform6Y, "assets/images/My Game/obstacle_2.png");
-                    if(show_diamond){
+                    if (show_diamond)
+                    {
                         iShowImage(diamondX, diamondY, "assets/images/My Game/diamond.png");
                     }
                     iSetColor(255, 255, 255);
@@ -160,12 +161,15 @@ void iDraw()
                         game_state = 0;
                     }
                 }
-                count=0;
-                if(level_complete){
-                    iShowImage(0,0,"assets/images/My Game/level_complete.jpg");
-                    count++;
-                    while(count<=10){
-                        Sleep(100);
+                int k = 0;
+                if (level_complete)
+                {
+                    iShowImage(0, 0, "assets/images/My Game/level_complete.jpg");
+                    k++;
+                    if(k >= 10)
+                    {
+                        levels=2;
+                        level_complete=false;
                     }
                 }
             }
@@ -242,7 +246,7 @@ void platform_collision()
     int minnieFeetY = minnieY + minnie_jump;
     if (minnieFeetX2 >= platform4X && minnieFeetX1 <= platform4X + obstacle2_width)
     {
-        if (minnieFeetY >= platform4Y + obstacle2_height - 5 &&minnieFeetY <= platform4Y + obstacle2_height + 10 && !jumpUp)
+        if (minnieFeetY >= platform4Y + obstacle2_height - 5 && minnieFeetY <= platform4Y + obstacle2_height + 10 && !jumpUp)
         {
             // minnie_jump=0;
             //  minnieY = platform4Y + obstacle2_height-minnie_jump;
@@ -256,7 +260,7 @@ void platform_collision()
     }
     if (minnieFeetX2 >= platform1X && minnieFeetX1 <= platform1X + obstacle1_width)
     {
-        if (minnieFeetY >= platform1Y + obstacle1_height - 5 &&minnieFeetY <= platform1Y + obstacle1_height + 10 && !jumpUp)
+        if (minnieFeetY >= platform1Y + obstacle1_height - 5 && minnieFeetY <= platform1Y + obstacle1_height + 10 && !jumpUp)
         {
             // minnie_jump=0;
             //  minnieY = platform4Y + obstacle2_height-minnie_jump;
@@ -270,7 +274,7 @@ void platform_collision()
     }
     if (minnieFeetX2 >= platform2X && minnieFeetX1 <= platform2X + obstacle2_width)
     {
-        if (minnieFeetY >= platform2Y + obstacle2_height - 5 &&minnieFeetY <= platform2Y + obstacle2_height + 10 && !jumpUp)
+        if (minnieFeetY >= platform2Y + obstacle2_height - 5 && minnieFeetY <= platform2Y + obstacle2_height + 10 && !jumpUp)
         {
             // minnie_jump=0;
             //  minnieY = platform4Y + obstacle2_height-minnie_jump;
@@ -300,7 +304,7 @@ void platform_collision()
 
     if (minnieFeetX2 >= platform5X && minnieFeetX1 <= platform5X + obstacle2_width)
     {
-        if (minnieFeetY >= platform5Y + obstacle2_height - 5 &&minnieFeetY <= platform5Y + obstacle2_height + 10 && !jumpUp)
+        if (minnieFeetY >= platform5Y + obstacle2_height - 5 && minnieFeetY <= platform5Y + obstacle2_height + 10 && !jumpUp)
         {
             // minnie_jump=0;
             //  minnieY = platform4Y + obstacle2_height-minnie_jump;
@@ -314,7 +318,7 @@ void platform_collision()
     }
     if (minnieFeetX2 >= platform6X && minnieFeetX1 <= platform6X + obstacle2_width)
     {
-        if (minnieFeetY >= platform6Y + obstacle2_height - 5 &&minnieFeetY <= platform6Y + obstacle2_height + 10 && !jumpUp)
+        if (minnieFeetY >= platform6Y + obstacle2_height - 5 && minnieFeetY <= platform6Y + obstacle2_height + 10 && !jumpUp)
         {
             // minnie_jump=0;
             //  minnieY = platform4Y + obstacle2_height-minnie_jump;
@@ -327,15 +331,17 @@ void platform_collision()
         onPlatform6 = false;
     }
 }
-void diamond_collect(){
+void diamond_collect()
+{
     int minnieFeetX1 = minnieX;
     int minnieFeetX2 = minnieX + minnie_width;
     int minnieFeetY = minnieY + minnie_jump;
-    if(minnieFeetX2>diamondX-5&&minnieFeetX1<diamondX+diamond_width+5){
-        if(minnieFeetY>diamondY-5&&minnieFeetY<diamondY+diamond_height+5){
-            level_complete=true;
-            levels=2;
-            show_diamond=false;
+    if (minnieFeetX2 > diamondX - 5 && minnieFeetX1 < diamondX + diamond_width + 5)
+    {
+        if (minnieFeetY > diamondY - 5 && minnieFeetY < diamondY + diamond_height + 5)
+        {
+            level_complete = true;
+            show_diamond = false;
         }
     }
 }
@@ -360,7 +366,7 @@ void update_running()
         //     minnie_jump=platform3Y+obstacle1_height;
 
         // }
-         minnieY=platform3Y+obstacle1_height;
+        minnieY = platform3Y + obstacle1_height;
     }
     if (onPlatform4)
     {
@@ -554,8 +560,8 @@ void iSpecialKeyboard(unsigned char key)
 {
     switch (key)
     {
-    // case GLUT_KEY_F2:
-    // levels=2;
+     case GLUT_KEY_PAGE_UP:
+     levels++;    
     case GLUT_KEY_LEFT:
         // game_state=2;
         isStanding = false;
@@ -632,12 +638,12 @@ int main(int argc, char *argv[])
     // iSetTimer(150,update_running);
     //  if(game_state==2){
     iSetTimer(45, update_jump);
-    iSetTimer(100, change_obstacle);
-    iSetTimer(70, update_running);
+    iSetTimer(50, change_obstacle);
+    iSetTimer(50, update_running);
     iSetTimer(50, platform_collision);
     iSetTimer(1000, timerUpdate);
     iSetTimer(300, scoreUpdate);
-    iSetTimer(30,diamond_collect);
+    iSetTimer(30, diamond_collect);
     // place your own initialization codes here.
     iInitializeSound();
     iInitialize(1200, 850, "MY GAME");
