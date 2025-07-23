@@ -4,8 +4,8 @@
 int jumpLimit = 160;
 int minnieHeight = 239;
 int minnieWidth = 187;
-int timer1 = 70;
-int timer2 = 500;
+int timer1 = 5;
+int timer2 = 50;
 int timer3 = 40;
 int timer4 = 30;
 int timer5 = 25;
@@ -27,8 +27,8 @@ int groundY = 150;
 int minnie_idx = 0;
 int minnie_jump = 0;
 int minnie_width = 90;
-int minnie_height=150;
-int obstacle1_width=100;
+int minnie_height = 150;
+int obstacle1_width = 100;
 int obstacle1_height = 30;
 int obstacle2_width = 150;
 int obstacle2_height = 30;
@@ -57,6 +57,7 @@ int platform6X = 200;
 int platform6Y = 450;
 int dx1 = 1;
 int dx2 = -1;
+int currentPlatform = -1;
 bool onPlatform1 = false;
 bool onPlatform2 = false;
 bool onPlatform3 = false;
@@ -69,8 +70,8 @@ char score[100];
 int count = 0;
 int diamondX = 1050;
 int diamondY = 700;
-int diamond_width = 70;
-int diamond_height = 100;
+int diamond_width = 58;
+int diamond_height = 52;
 bool level_complete = false;
 bool show_diamond = true;
 int minnie2X = 30;
@@ -106,7 +107,15 @@ int zombie_idx = 0;
 int portalX = 270;
 int portalY = 230 + stage2H;
 int soundPlayed = 0;
-bool onPlatform=false;
+bool onPlatform = false;
+bool input_mode = false;
+int name_idx = 0;
+char current_player[50];
+int total_score[100];
+int scoreidx = 0;
+char total_players[50][100];
+int playeridx = 0;
+bool scoreSaved = false;
 // int minnie_jump_idx=0;
 /*
 function iDraw() is called again and again by the system.
@@ -143,6 +152,14 @@ void iDraw()
         if (levels == 0)
         {
             iShowImage(0, 0, "assets/images/My Game/player name.png");
+            // iSetColor(0,0,0);
+            // iText(450, 530, "Enter Your Name:", GLUT_BITMAP_TIMES_ROMAN_24);
+            // iSetColor(221,226,63);
+            // iFilledRectangle(354,430, 500, 85);
+            iSetColor(0, 0, 0);
+            iText(448, 455, current_player, GLUT_BITMAP_HELVETICA_18);
+            // iSetColor(100, 100, 100);
+            // iText(160, 350, "(Press Enter to continue)", GLUT_BITMAP_HELVETICA_12);
         }
         for (int i = 0; i <= 5; i++)
         {
@@ -196,19 +213,18 @@ void iDraw()
                 }
                 if (levels == 2)
                 {
-                    iSetColor(255,255,255);
-                    iRectangle(minnie2X,minnie2Y,minnie_width,minnie_height);
                     iSetColor(255, 255, 255);
-                    iText(1000, 800, timer, GLUT_BITMAP_TIMES_ROMAN_24);
-                    iText(70, 800, score, GLUT_BITMAP_TIMES_ROMAN_24);
+                    sprintf(timer, "Time Left: %d", timer2);
+                    sprintf(score, "Score: %d", scoreLeft);
                     iShowImage(zombie1X, zombie1Y, zombie[zombie_idx]);
                     iShowImage(portalX, portalY, portal[portalidx]);
                     if (show_diamond)
                     {
-                        iSetColor(0,0,0);
-                        iRectangle(diamondX,diamondY,diamond_width,diamond_height);
                         iShowImage(1120, 534, "assets/images/My Game/diamond.png");
                     }
+                    iSetColor(255, 255, 255);
+                    iText(1000, 800, timer, GLUT_BITMAP_TIMES_ROMAN_24);
+                    iText(70, 800, score, GLUT_BITMAP_TIMES_ROMAN_24);
 
                     // iShowImage(zombie2X, zombie2Y, zombie[zombie_idx]);
                     if (isStanding)
@@ -253,7 +269,7 @@ void iDraw()
 }
 void scoreUpdate()
 {
-    if (!gameOver && !level_complete)
+    if ((levels == 1 || levels == 2 || levels == 3) && (!gameOver && !level_complete))
     {
         scoreLeft--;
     }
@@ -274,6 +290,15 @@ void timerUpdate()
         if (timer1 == 0 && !soundPlayed)
         {
             gameOver = true;
+            // total_score[scoreidx]=scoreLeft;
+            // printf("%d",total_score[scoreidx]);
+            // scoreidx++;
+            FILE *fcharacter_name = fopen("leaderboard.txt", "a");
+            if (fcharacter_name != NULL)
+            {
+                fprintf(fcharacter_name, "%d\n", scoreLeft);
+                fclose(fcharacter_name);
+            }
             if (soundPlayed == 0)
             {
                 iPlaySound("assets/sounds/over.wav", false, 100);
@@ -287,10 +312,23 @@ void timerUpdate()
         {
             timer2--;
         }
+        if (timer2 == 3)
+        {
+            iPlaySound("assets/sounds/timer.wav", false, 100);
+        }
 
         if (timer2 == 0)
         {
             gameOver = true;
+            FILE *fcharacter_name = fopen("leaderboard.txt", "a");
+            if (fcharacter_name != NULL)
+            {
+                fprintf(fcharacter_name, "%d\n", scoreLeft);
+                fclose(fcharacter_name);
+            }
+            // total_score[scoreidx]=scoreLeft;
+            // printf("%d",total_score[scoreidx]);
+            // scoreidx++;
             if (!soundPlayed)
             {
                 iPlaySound("assets/sounds/over.wav", false, 100);
@@ -343,7 +381,7 @@ void platform_collision()
                 //  minnieY = platform4Y + obstacle2_height-minnie_jump;
                 onPlatform4 = true;
                 onPlatform1 = onPlatform2 = onPlatform3 = onPlatform6 = onPlatform5 = false;
-                onPlatform=true;
+                onPlatform = true;
             }
         }
         else
@@ -358,7 +396,7 @@ void platform_collision()
                 //  minnieY = platform4Y + obstacle2_height-minnie_jump;
                 onPlatform1 = true;
                 onPlatform6 = onPlatform2 = onPlatform3 = onPlatform4 = onPlatform5 = false;
-                onPlatform=true;
+                onPlatform = true;
             }
         }
         else
@@ -373,7 +411,7 @@ void platform_collision()
                 //  minnieY = platform4Y + obstacle2_height-minnie_jump;
                 onPlatform2 = true;
                 onPlatform1 = onPlatform6 = onPlatform3 = onPlatform4 = onPlatform5 = false;
-                onPlatform=true;
+                onPlatform = true;
             }
         }
         else
@@ -390,7 +428,7 @@ void platform_collision()
                 onPlatform3 = true;
 
                 onPlatform1 = onPlatform2 = onPlatform6 = onPlatform4 = onPlatform5 = false;
-                onPlatform=true;
+                onPlatform = true;
             }
         }
         else
@@ -406,7 +444,7 @@ void platform_collision()
                 //  minnieY = platform4Y + obstacle2_height-minnie_jump;
                 onPlatform5 = true;
                 onPlatform1 = onPlatform2 = onPlatform3 = onPlatform4 = onPlatform6 = false;
-                onPlatform=true;
+                onPlatform = true;
             }
         }
         else
@@ -421,7 +459,7 @@ void platform_collision()
                 //  minnieY = platform4Y + obstacle2_height-minnie_jump;
                 onPlatform6 = true;
                 onPlatform1 = onPlatform2 = onPlatform3 = onPlatform4 = onPlatform5 = false;
-                onPlatform=true;
+                onPlatform = true;
             }
         }
         else
@@ -545,11 +583,11 @@ void diamond_collect()
             {
                 level_complete = true;
                 show_diamond = false;
-                if(!soundPlayed){
+                if (!soundPlayed)
+                {
                     iPlaySound("assets/sounds/complete.wav", false, 100);
-                    soundPlayed=1;
+                    soundPlayed = 1;
                 }
-                
             }
         }
     }
@@ -560,6 +598,17 @@ void diamond_collect()
             if (minnie2Y + minnie_jump >= 534 - 20 && minnie2Y + minnie_jump <= 534 + diamond_height + 20)
             {
                 level_complete = true;
+                if (!scoreSaved)
+                {
+                    FILE *fcharacter_name = fopen("leaderboard.txt", "a");
+                    if (fcharacter_name != NULL)
+                    {
+                        fprintf(fcharacter_name, "%d\n", scoreLeft);
+                        fclose(fcharacter_name);
+                    }
+                    scoreSaved = true;
+                }
+
                 show_diamond = false;
                 if (!soundPlayed)
                 {
@@ -591,31 +640,63 @@ void update_running()
     // int k = 0;
     if (levels == 1)
     {
-        if (onPlatform3)
-        {   
-            minnie1Y= platform3Y + obstacle1_height;
-            //minnie_jump=0;          
-            
+        if (currentPlatform != 3 && onPlatform3)
+        {
+            minnie1Y = platform3Y + obstacle1_height;
+            isJumping = false;
+            jumpUp = false;
+            minnie_jump = 0;
+            currentPlatform = 3;
         }
-        if (onPlatform4)
+        if (currentPlatform != 4 && onPlatform4)
         {
 
             minnie1Y = platform4Y + obstacle2_height;
+            isJumping = false;
+            jumpUp = false;
+            minnie_jump = 0;
+            currentPlatform = 4;
         }
-        if (onPlatform5)
+        if (currentPlatform != 5 && onPlatform5)
         {
             minnie1Y = platform5Y + obstacle2_height;
+            isJumping = false;
+            jumpUp = false;
+            minnie_jump = 0;
+            currentPlatform = 5;
         }
-        if (onPlatform6)
+        if (currentPlatform != 6 && onPlatform6)
         {
             minnie1Y = platform6Y + obstacle2_height;
+            isJumping = false;
+            jumpUp = false;
+            minnie_jump = 0;
+            currentPlatform = 6;
         }
-        if (onPlatform1)
+        if (currentPlatform != 1 && onPlatform1)
+        {
+            minnie1Y = platform1Y + obstacle1_height;
+            minnie1X += dx * dx1;
+            currentPlatform = 1;
+            isJumping = false;
+            jumpUp = false;
+            minnie_jump = 0;
+        }
+        if (currentPlatform == 1 && onPlatform1)
         {
             minnie1Y = platform1Y + obstacle1_height;
             minnie1X += dx * dx1;
         }
-        if (onPlatform2)
+        if (currentPlatform != 2 && onPlatform2)
+        {
+            minnie1Y = platform2Y + obstacle2_height;
+            minnie1X += dx * dx2;
+            currentPlatform = 2;
+            isJumping = false;
+            jumpUp = false;
+            minnie_jump = 0;
+        }
+        if (currentPlatform == 2 && onPlatform2)
         {
             minnie1Y = platform2Y + obstacle2_height;
             minnie1X += dx * dx2;
@@ -627,6 +708,7 @@ void update_running()
             {
                 minnie1Y = 150;
             }
+            currentPlatform = -1;
         }
     }
     if (levels == 2)
@@ -683,7 +765,6 @@ void update_running()
                 minnie2Y = 880;
             }
         }
-        
     }
     // if (levels == 2)
     // {
@@ -718,15 +799,30 @@ void portal_collisison()
                 scoreLeft -= 10;
             }
         }
-        if (minnie2X + minnie_width >= zombie1X-5&&minnie2X<=zombie1X+100+5)
+        if (minnie2X + minnie_width >= zombie1X - 5 && minnie2X <= zombie1X + 100 + 5)
         {
-            if (minnie2Y+minnie_jump>= zombie1Y-20 && minnie2Y+minnie_jump<= zombie1Y + 200+20)
+            if (minnie2Y + minnie_jump >= zombie1Y - 20 && minnie2Y + minnie_jump <= zombie1Y + 200 + 20)
             {
                 gameOver = true;
-                if(!soundPlayed){
-                    iPlaySound("assets/sounds/over.wav",false,100);
-                    soundPlayed=1;
+                if(!scoreSaved){
+                     FILE *fcharacter_name = fopen("leaderboard.txt", "a");
+                if (fcharacter_name != NULL)
+                {
+                    fprintf(fcharacter_name, "%d\n", scoreLeft);
+                    fclose(fcharacter_name);
                 }
+                scoreSaved=true;
+                }
+               
+                // total_score[scoreidx]=scoreLeft;
+                // printf("%d",total_score[scoreidx]);
+                scoreidx++;
+                if (!soundPlayed)
+                {
+                    iPlaySound("assets/sounds/over.wav", false, 100);
+                    soundPlayed = 1;
+                }
+                // printf("%s %d\n",total_players[playeridx],total_score[scoreidx]);
             }
         }
     }
@@ -797,7 +893,7 @@ void iMouse(int button, int state, int mx, int my)
 {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
     {
-        if (game_state == 0)
+        if (game_state == 0 && levels == 0)
         {
             if (mx >= 100 && mx <= 379)
             {
@@ -827,14 +923,14 @@ void iMouse(int button, int state, int mx, int my)
 
         if (game_state == 1 && levels == 0)
         {
-            if (mx >= 477 && mx <= 721)
+            if (mx >= 430 && mx <= 780)
             {
-                if (my >= 405 && my <= 444)
+                if (my >= 440 && my <= 480)
                 {
                     iPlaySound("assets/sounds/mouse_click.wav", false, 100);
                     // FILE *playername=(player_name);
                     game_state = 1;
-                    levels = 1;
+                    input_mode = true;
                 }
             }
         }
@@ -896,6 +992,42 @@ key- holds the ASCII value of the key pressed.
 */
 void iKeyboard(unsigned char key)
 {
+    if (input_mode)
+    {
+        if (key == '\r') // Enter key
+        {
+            input_mode = false;
+            levels = 1; // move to level 1
+
+            // save name to file
+            FILE *fcharacter_name = fopen("leaderboard.txt", "a");
+            if (fcharacter_name != NULL)
+            {
+                fprintf(fcharacter_name, "%s\t", current_player);
+                fclose(fcharacter_name);
+            }
+            // strcpy(total_players[playeridx],current_player);
+            // printf("%s\n",total_players[playeridx]);
+            // playeridx++;
+        }
+        else if (key == '\b') // Backspace key
+        {
+            if (name_idx > 0)
+            {
+                name_idx--;
+                current_player[name_idx] = '\0';
+            }
+        }
+        else
+        {
+            if (name_idx < 49)
+            {
+                current_player[name_idx++] = key;
+                current_player[name_idx] = '\0';
+            }
+        }
+    }
+
     switch (key)
     {
     case 'q':
@@ -1022,10 +1154,10 @@ int main(int argc, char *argv[])
 {
     glutInit(&argc, argv);
     load_image();
-    iSetTimer(35, update_jump);
-    iSetTimer(10, change_obstacle);
+    iSetTimer(30, update_jump);
+    iSetTimer(30, change_obstacle);
     iSetTimer(30, update_running);
-    iSetTimer(50, platform_collision);
+    iSetTimer(30, platform_collision);
     iSetTimer(1000, timerUpdate);
     iSetTimer(300, scoreUpdate);
     iSetTimer(50, update_portal);
