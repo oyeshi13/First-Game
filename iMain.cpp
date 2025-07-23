@@ -4,12 +4,13 @@
 int jumpLimit = 160;
 int minnieHeight = 239;
 int minnieWidth = 187;
-int timer1 = 10;
-int timer2 = 50;
+int timer1 = 70;
+int timer2 = 500;
 int timer3 = 40;
 int timer4 = 30;
 int timer5 = 25;
 int scoreLeft = 1010;
+int portalidx = 0;
 Image menu, leaderboard, help, obstacle_1, obstacle_2, player_name, gameover, diamond, level_comp;
 // char minnie_idle[2][100]={"assets/images/idle/1.png","assets/images/idle/2.png"};
 char minnie_running[6][100] = {"assets/images/My Game/minnie_running/tile000.png", "assets/images/My Game/minnie_running/tile001.png", "assets/images/My Game/minnie_running/tile002.png", "assets/images/My Game/minnie_running/tile003.png", "assets/images/My Game/minnie_running/tile004.png", "assets/images/My Game/minnie_running/tile005.png"};
@@ -17,6 +18,7 @@ char minnie_jumping[6][100] = {"assets/images/My Game/minnie_jumping/jumping000.
 char digbazi[6][100] = {"assets/images/My Game/minnie_digbazi/digbazi000.png", "assets/images/My Game/minnie_digbazi/digbazi001.png", "assets/images/My Game/minnie_digbazi/digbazi002.png", "assets/images/My Game/minnie_digbazi/digbazi003.png", "assets/images/My Game/minnie_digbazi/digbazi004.png", "assets/images/My Game/minnie_digbazi/digbazi005.png"};
 char level[5][100] = {"assets/images/My Game/level/level 1.jpg", "assets/images/My Game/level/level 2.png", "assets/images/My Game/level/level 3.png", "assets/images/My Game/level/level 4.png", "assets/images/My Game/level/level 5.png"};
 // bg1,bg2,bg3,bg4,space_images[3];
+char portal[4][100] = {"assets/images/My Game/portal/tile000.png", "assets/images/My Game/portal/tile001.png", "assets/images/My Game/portal/tile002.png", "assets/images/My Game/portal/tile003.png"};
 char zombie[6][100] = {"assets/images/My Game/zombie/tile000.png", "assets/images/My Game/zombie/tile001.png", "assets/images/My Game/zombie/tile002.png", "assets/images/My Game/zombie/tile003.png", "assets/images/My Game/zombie/tile004.png", "assets/images/My Game/zombie/tile005.png"};
 int game_state = 0;
 int minnie1X = 30;
@@ -24,9 +26,9 @@ int minnie1Y = 150;
 int groundY = 150;
 int minnie_idx = 0;
 int minnie_jump = 0;
-int minnie_width = 140;
-int minnie_height = 200;
-int obstacle1_width = 100;
+int minnie_width = 90;
+int minnie_height=150;
+int obstacle1_width=100;
 int obstacle1_height = 30;
 int obstacle2_width = 150;
 int obstacle2_height = 30;
@@ -101,8 +103,10 @@ bool onStage8 = false;
 int zombie1X = 830;
 int zombie1Y = 465;
 int zombie_idx = 0;
-int zombie2X = 270;
-int zombie2Y = 250 + stage2H;
+int portalX = 270;
+int portalY = 230 + stage2H;
+int soundPlayed = 0;
+bool onPlatform=false;
 // int minnie_jump_idx=0;
 /*
 function iDraw() is called again and again by the system.
@@ -126,17 +130,16 @@ void iDraw()
     // place your drawing codes here
     iClear();
 
-
     if (game_state == 0)
     {
-        // iPlaySound("assets/sounds/GameBG.wav", true, 1000);
+
         iShowImage(0, 0, "assets/images/My Game/Menu.jpg");
         // iSetColor(255, 0, 0);
         // iFilledRectangle(0, 0, 200, 200);
     }
     else if (game_state == 1)
     {
-        // iPlaySound("assets/sounds/GameBG.wav", true, 1000);
+
         if (levels == 0)
         {
             iShowImage(0, 0, "assets/images/My Game/player name.png");
@@ -146,7 +149,7 @@ void iDraw()
             // if(!isJumping && !isRunning){
             //         isStanding=true;
             //     }
-            
+
             if (levels == i + 1)
             {
                 iShowImage(0, 0, level[i]);
@@ -178,8 +181,11 @@ void iDraw()
                     {
                         if (isRunning)
                         {
+                            if (isJumping)
+                            {
+                                // printf("iDraw: %d %d\n", jumpUp, minnie_jump);
+                            }
                             iShowImage(minnie1X, minnie1Y + minnie_jump, minnie_running[minnie_running_idx]);
-                            Sleep(35);
                         }
                         else if (isJumping)
                         {
@@ -190,11 +196,21 @@ void iDraw()
                 }
                 if (levels == 2)
                 {
+                    iSetColor(255,255,255);
+                    iRectangle(minnie2X,minnie2Y,minnie_width,minnie_height);
                     iSetColor(255, 255, 255);
                     iText(1000, 800, timer, GLUT_BITMAP_TIMES_ROMAN_24);
                     iText(70, 800, score, GLUT_BITMAP_TIMES_ROMAN_24);
                     iShowImage(zombie1X, zombie1Y, zombie[zombie_idx]);
-                    iShowImage(zombie2X, zombie2Y, zombie[zombie_idx]);
+                    iShowImage(portalX, portalY, portal[portalidx]);
+                    if (show_diamond)
+                    {
+                        iSetColor(0,0,0);
+                        iRectangle(diamondX,diamondY,diamond_width,diamond_height);
+                        iShowImage(1120, 534, "assets/images/My Game/diamond.png");
+                    }
+
+                    // iShowImage(zombie2X, zombie2Y, zombie[zombie_idx]);
                     if (isStanding)
                     {
                         iShowImage(minnie2X, minnie2Y + minnie_jump, minnie_jumping[0]);
@@ -226,25 +242,15 @@ void iDraw()
     }
     if (game_state == 2)
     {
-        iPlaySound("assets/sounds/GameBG.wav", true, 1000);
+
         iShowImage(0, 0, "assets/images/My game/leaderboard 3.png");
     }
     if (game_state == 3)
     {
-        iPlaySound("assets/sounds/GameBG.wav", true, 100);
+
         iShowImage(0, 0, "assets/images/My Game/help.png");
     }
 }
-
-// void platform_collision(){
-//     if(minnieX+minnie_width>=platform4X&&minnieX<=platform4X+obstacle2_width){
-//         if(minnieY+minnie_jump>=platform4Y+obstacle2_height){
-//             minnie_jump=platform4Y+obstacle2_height;
-//              onPlatform=true;
-//         }
-
-//     }
-// }
 void scoreUpdate()
 {
     if (!gameOver && !level_complete)
@@ -256,18 +262,23 @@ void timerUpdate()
 {
     if (levels == 1)
     {
+        // soundPlayed=0;
         if (timer1 > 0)
         {
             timer1--;
         }
-        if (timer1<=5)
+        if (timer1 == 3)
         {
             iPlaySound("assets/sounds/timer.wav", false, 100);
         }
-        if (timer1 == 0)
+        if (timer1 == 0 && !soundPlayed)
         {
             gameOver = true;
-            iPlaySound("assets/sounds/over.wav", false, 100);
+            if (soundPlayed == 0)
+            {
+                iPlaySound("assets/sounds/over.wav", false, 100);
+                soundPlayed = 1;
+            }
         }
     }
     if (levels == 2)
@@ -276,14 +287,15 @@ void timerUpdate()
         {
             timer2--;
         }
-        if (timer1<=5)
-        {
-            iPlaySound("assets/sounds/timer.wav", false, 100);
-        }
+
         if (timer2 == 0)
         {
             gameOver = true;
-            iPlaySound("assets/sounds/over.wav", false, 100);
+            if (!soundPlayed)
+            {
+                iPlaySound("assets/sounds/over.wav", false, 100);
+                soundPlayed = 1;
+            }
         }
     }
     if (levels == 3)
@@ -331,6 +343,7 @@ void platform_collision()
                 //  minnieY = platform4Y + obstacle2_height-minnie_jump;
                 onPlatform4 = true;
                 onPlatform1 = onPlatform2 = onPlatform3 = onPlatform6 = onPlatform5 = false;
+                onPlatform=true;
             }
         }
         else
@@ -345,6 +358,7 @@ void platform_collision()
                 //  minnieY = platform4Y + obstacle2_height-minnie_jump;
                 onPlatform1 = true;
                 onPlatform6 = onPlatform2 = onPlatform3 = onPlatform4 = onPlatform5 = false;
+                onPlatform=true;
             }
         }
         else
@@ -359,6 +373,7 @@ void platform_collision()
                 //  minnieY = platform4Y + obstacle2_height-minnie_jump;
                 onPlatform2 = true;
                 onPlatform1 = onPlatform6 = onPlatform3 = onPlatform4 = onPlatform5 = false;
+                onPlatform=true;
             }
         }
         else
@@ -373,7 +388,9 @@ void platform_collision()
                 // minnie_jump=0;
                 //  minnieY = platform4Y + obstacle2_height-minnie_jump;
                 onPlatform3 = true;
+
                 onPlatform1 = onPlatform2 = onPlatform6 = onPlatform4 = onPlatform5 = false;
+                onPlatform=true;
             }
         }
         else
@@ -389,6 +406,7 @@ void platform_collision()
                 //  minnieY = platform4Y + obstacle2_height-minnie_jump;
                 onPlatform5 = true;
                 onPlatform1 = onPlatform2 = onPlatform3 = onPlatform4 = onPlatform6 = false;
+                onPlatform=true;
             }
         }
         else
@@ -403,6 +421,7 @@ void platform_collision()
                 //  minnieY = platform4Y + obstacle2_height-minnie_jump;
                 onPlatform6 = true;
                 onPlatform1 = onPlatform2 = onPlatform3 = onPlatform4 = onPlatform5 = false;
+                onPlatform=true;
             }
         }
         else
@@ -526,7 +545,27 @@ void diamond_collect()
             {
                 level_complete = true;
                 show_diamond = false;
-                iPlaySound("assets/sounds/complete.wav", false, 100);
+                if(!soundPlayed){
+                    iPlaySound("assets/sounds/complete.wav", false, 100);
+                    soundPlayed=1;
+                }
+                
+            }
+        }
+    }
+    if (levels == 2)
+    {
+        if (minnie2X + minnie_width - 5 >= 1120 && minnie2X <= 1120 + diamond_width + 5)
+        {
+            if (minnie2Y + minnie_jump >= 534 - 20 && minnie2Y + minnie_jump <= 534 + diamond_height + 20)
+            {
+                level_complete = true;
+                show_diamond = false;
+                if (!soundPlayed)
+                {
+                    iPlaySound("assets/sounds/complete.wav", false, 100);
+                    soundPlayed = 1;
+                }
             }
         }
     }
@@ -549,14 +588,18 @@ void change_obstacle()
 }
 void update_running()
 {
+    // int k = 0;
     if (levels == 1)
     {
         if (onPlatform3)
-        {
-            minnie1Y = platform3Y + obstacle1_height;
+        {   
+            minnie1Y= platform3Y + obstacle1_height;
+            //minnie_jump=0;          
+            
         }
         if (onPlatform4)
         {
+
             minnie1Y = platform4Y + obstacle2_height;
         }
         if (onPlatform5)
@@ -640,17 +683,53 @@ void update_running()
                 minnie2Y = 880;
             }
         }
-        if (minnie2X + minnie_width - 20 >= zombie1X || minnie2X + minnie_width - 20 >= zombie2X)
-        {
-            if (((minnie2Y >= zombie1Y) && (minnie2Y <= zombie1Y + 200)) || ((minnie2Y >= zombie2Y) && (minnie2Y <= zombie2Y + 200)))
-            {
-                gameOver = true;
-            }
-        }
+        
     }
     // if (levels == 2)
     // {
     // }
+}
+void update_portal()
+{
+    if (levels == 2)
+    {
+        portalidx++;
+        if (portalidx > 3)
+        {
+            portalidx--;
+        }
+        if (portalidx < 0)
+        {
+            portalidx++;
+        }
+    }
+}
+void portal_collisison()
+{
+    if (levels == 2)
+    {
+        if (minnie2X >= portalX && minnie2X <= portalX + 50)
+        {
+            if (minnie2Y >= portalY - 20 && minnie2Y <= portalY + 50 && !jumpUp)
+            {
+                minnie2X = stage1X;
+                minnie2Y = stage1Y + stage1H;
+                timer2 -= 5;
+                scoreLeft -= 10;
+            }
+        }
+        if (minnie2X + minnie_width >= zombie1X-5&&minnie2X<=zombie1X+100+5)
+        {
+            if (minnie2Y+minnie_jump>= zombie1Y-20 && minnie2Y+minnie_jump<= zombie1Y + 200+20)
+            {
+                gameOver = true;
+                if(!soundPlayed){
+                    iPlaySound("assets/sounds/over.wav",false,100);
+                    soundPlayed=1;
+                }
+            }
+        }
+    }
 }
 void update_jump()
 {
@@ -676,10 +755,6 @@ void update_jump()
 
         else
         {
-            // if (onPlatform3 && minnieY < platform3Y + obstacle1_height)
-            // {
-            //     minnieY = platform3Y + obstacle1_height;
-            // }
             minnie_jump -= 10;
             minnie_jumping_idx--;
             if (minnie_jumping_idx <= 0)
@@ -772,6 +847,7 @@ void iMouse(int button, int state, int mx, int my)
                     iPlaySound("assets/sounds/mouse_click.wav", false, 100);
                     level_complete = false;
                     levels++;
+                    show_diamond = true;
                 }
             }
         }
@@ -792,6 +868,7 @@ void iMouse(int button, int state, int mx, int my)
                     minnie1Y = 150;
                     minnie2X = 30;
                     minnie2Y = 400;
+                    soundPlayed = 0;
                 }
             }
         }
@@ -945,24 +1022,22 @@ int main(int argc, char *argv[])
 {
     glutInit(&argc, argv);
     load_image();
-    // space();
-    // iSetTimer(150,update_minnie);
-    // iSetTimer(150,update_running);
-    //  if(game_state==2){
     iSetTimer(35, update_jump);
     iSetTimer(10, change_obstacle);
     iSetTimer(30, update_running);
     iSetTimer(50, platform_collision);
     iSetTimer(1000, timerUpdate);
     iSetTimer(300, scoreUpdate);
-    if (level_complete)
-    {
-        iPauseTimer(5);
-    }
+    iSetTimer(50, update_portal);
+    iSetTimer(20, portal_collisison);
     iSetTimer(30, diamond_collect);
     iSetTimer(160, update_zombie);
     // place your own initialization codes here.
     iInitializeSound();
+    if (!gameOver && !level_complete)
+    {
+        iPlaySound("assets/sounds/GameBG.wav", true, 100);
+    }
     iInitialize(1200, 850, "MY GAME");
 
     return 0;
