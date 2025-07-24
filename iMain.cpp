@@ -4,7 +4,7 @@
 int jumpLimit = 160;
 int minnieHeight = 239;
 int minnieWidth = 187;
-int timer1 = 5;
+int timer1 = 70;
 int timer2 = 50;
 int timer3 = 40;
 int timer4 = 30;
@@ -116,11 +116,17 @@ int scoreidx = 0;
 char total_players[50][100];
 int playeridx = 0;
 bool scoreSaved = false;
+#define MAX_PLAYERS 50
+
+char playerNames[MAX_PLAYERS][100];
+int playerScores[MAX_PLAYERS];
+int playerCount = 0;
+
 // int minnie_jump_idx=0;
 /*
 function iDraw() is called again and again by the system.
 */
-
+void loadLeaderboard();
 void load_image()
 {
     iLoadImage(&menu, "assets/images/My Game/Menu.jpg");
@@ -260,6 +266,30 @@ void iDraw()
     {
 
         iShowImage(0, 0, "assets/images/My game/leaderboard 3.png");
+        int baseY = 470;
+        int rowHeight = 30;
+        loadLeaderboard();
+
+        iSetColor(0,0,0);
+        iText(495, 510, "TOP 5 SCORERS", GLUT_BITMAP_TIMES_ROMAN_24);
+
+        for (int i = 0; i < playerCount && i < 5; i++)
+        {   
+            int y = baseY - i * rowHeight;
+            //char buffer[200];
+            char rank[5];
+            if( i == 0 ) strcpy(rank, "1st");
+            else if( i == 1 ) strcpy(rank, "2nd");
+            else if( i == 2 ) strcpy(rank, "3rd");
+            else if( i == 3 ) strcpy(rank, "4th");
+            else if( i == 4 ) strcpy(rank, "5th");
+            iText( 495, y, rank, GLUT_BITMAP_HELVETICA_18);
+            iText( 540, y, playerNames[i], GLUT_BITMAP_HELVETICA_18);
+            //sprintf(buffer, "%-17s%-15s%20d",rank, playerNames[i], playerScores[i]);
+            char scoreText[5];
+            sprintf(scoreText, "%d", playerScores[i]);
+            iText(630, y , scoreText, GLUT_BITMAP_HELVETICA_18);
+        }
     }
     if (game_state == 3)
     {
@@ -804,16 +834,17 @@ void portal_collisison()
             if (minnie2Y + minnie_jump >= zombie1Y - 20 && minnie2Y + minnie_jump <= zombie1Y + 200 + 20)
             {
                 gameOver = true;
-                if(!scoreSaved){
-                     FILE *fcharacter_name = fopen("leaderboard.txt", "a");
-                if (fcharacter_name != NULL)
+                if (!scoreSaved)
                 {
-                    fprintf(fcharacter_name, "%d\n", scoreLeft);
-                    fclose(fcharacter_name);
+                    FILE *fcharacter_name = fopen("leaderboard.txt", "a");
+                    if (fcharacter_name != NULL)
+                    {
+                        fprintf(fcharacter_name, "%d\n", scoreLeft);
+                        fclose(fcharacter_name);
+                    }
+                    scoreSaved = true;
                 }
-                scoreSaved=true;
-                }
-               
+
                 // total_score[scoreidx]=scoreLeft;
                 // printf("%d",total_score[scoreidx]);
                 scoreidx++;
@@ -1147,6 +1178,55 @@ void iSpecialKeyboard(unsigned char key)
         game_state = 0;
     default:
         break;
+    }
+}
+
+int compareScores(const void *a, const void *b)
+{
+    int indexA = *(int *)a;
+    int indexB = *(int *)b;
+    return playerScores[indexB] - playerScores[indexA]; // Descending order
+}
+
+void loadLeaderboard()
+{
+    FILE *fp = fopen("leaderboard.txt", "r");
+    playerCount = 0;
+
+    if (fp != NULL)
+    {
+        while (fscanf(fp, "%s%d", playerNames[playerCount], &playerScores[playerCount]) == 2)
+        {
+            playerCount++;
+            if (playerCount >= MAX_PLAYERS)
+                break;
+        }
+        fclose(fp);
+    }
+
+    // Create an index array to sort by score
+    int indices[MAX_PLAYERS];
+    for (int i = 0; i < playerCount; i++)
+    {
+        indices[i] = i;
+    }
+
+    qsort(indices, playerCount, sizeof(int), compareScores);
+
+    // Make a temporary copy of sorted names and scores
+    char tempNames[MAX_PLAYERS][100];
+    int tempScores[MAX_PLAYERS];
+    for (int i = 0; i < playerCount; i++)
+    {
+        strcpy(tempNames[i], playerNames[indices[i]]);
+        tempScores[i] = playerScores[indices[i]];
+    }
+
+    // Copy back to original arrays
+    for (int i = 0; i < playerCount; i++)
+    {
+        strcpy(playerNames[i], tempNames[i]);
+        playerScores[i] = tempScores[i];
     }
 }
 
