@@ -4,7 +4,7 @@
 int jumpLimit = 160;
 int minnieHeight = 239;
 int minnieWidth = 187;
-int timer1 = 5;
+int timer1 = 70;
 int timer2 = 50;
 int timer3 = 40;
 int timer4 = 30;
@@ -320,12 +320,17 @@ void timerUpdate()
         if (timer2 == 0)
         {
             gameOver = true;
-            FILE *fcharacter_name = fopen("leaderboard.txt", "a");
-            if (fcharacter_name != NULL)
+            if (!scoreSaved)
             {
-                fprintf(fcharacter_name, "%d\n", scoreLeft);
-                fclose(fcharacter_name);
+                FILE *fcharacter_name = fopen("leaderboard.txt", "a");
+                if (fcharacter_name != NULL)
+                {
+                    fprintf(fcharacter_name, "%d\n", scoreLeft);
+                    fclose(fcharacter_name);
+                }
+                scoreSaved = true;
             }
+
             // total_score[scoreidx]=scoreLeft;
             // printf("%d",total_score[scoreidx]);
             // scoreidx++;
@@ -804,16 +809,17 @@ void portal_collisison()
             if (minnie2Y + minnie_jump >= zombie1Y - 20 && minnie2Y + minnie_jump <= zombie1Y + 200 + 20)
             {
                 gameOver = true;
-                if(!scoreSaved){
-                     FILE *fcharacter_name = fopen("leaderboard.txt", "a");
-                if (fcharacter_name != NULL)
+                if (!scoreSaved)
                 {
-                    fprintf(fcharacter_name, "%d\n", scoreLeft);
-                    fclose(fcharacter_name);
+                    FILE *fcharacter_name = fopen("leaderboard.txt", "a");
+                    if (fcharacter_name != NULL)
+                    {
+                        fprintf(fcharacter_name, "%d\n", scoreLeft);
+                        fclose(fcharacter_name);
+                    }
+                    scoreSaved = true;
                 }
-                scoreSaved=true;
-                }
-               
+
                 // total_score[scoreidx]=scoreLeft;
                 // printf("%d",total_score[scoreidx]);
                 scoreidx++;
