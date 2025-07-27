@@ -1,11 +1,6 @@
-<<<<<<< HEAD
 oyeshi	945
 hiii	854
-=======
-oyeshi	791
-1	995
-2	997
-3	822
-raisa	994
-raisa	844
->>>>>>> bd81b7dee9eca4b9d99a404e806df2e346b26c6d
+oyeshi	788
+again me	824
+oyeshi	871
+oyeshi	

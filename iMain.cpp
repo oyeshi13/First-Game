@@ -223,7 +223,7 @@ void iDraw()
                     sprintf(timer, "Time Left: %d", timer2);
                     sprintf(score, "Score: %d", scoreLeft);
                     iShowImage(zombie1X, zombie1Y, zombie[zombie_idx]);
-                    iShowImage(portalX, portalY, portal[portalidx]);
+                    iShowImage(portalX, portalY, portal[3]);
                     if (show_diamond)
                     {
                         iShowImage(1120, 534, "assets/images/My Game/diamond.png");
@@ -298,11 +298,12 @@ void iDraw()
     }
 }
 void scoreUpdate()
-{
+{   
     if ((levels == 1 || levels == 2 || levels == 3) && (!gameOver && !level_complete))
     {
         scoreLeft--;
     }
+    
 }
 void timerUpdate()
 {
@@ -805,21 +806,6 @@ void update_running()
     // {
     // }
 }
-void update_portal()
-{
-    if (levels == 2)
-    {
-        portalidx++;
-        if (portalidx > 3)
-        {
-            portalidx--;
-        }
-        if (portalidx < 0)
-        {
-            portalidx++;
-        }
-    }
-}
 void portal_collisison()
 {
     if (levels == 2)
@@ -1245,7 +1231,7 @@ int main(int argc, char *argv[])
     iSetTimer(30, platform_collision);
     iSetTimer(1000, timerUpdate);
     iSetTimer(300, scoreUpdate);
-    iSetTimer(50, update_portal);
+    //iSetTimer(50, update_portal);
     iSetTimer(20, portal_collisison);
     iSetTimer(30, diamond_collect);
     iSetTimer(160, update_zombie);
