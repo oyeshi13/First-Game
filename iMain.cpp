@@ -121,12 +121,34 @@ bool scoreSaved = false;
 char playerNames[MAX_PLAYERS][100];
 int playerScores[MAX_PLAYERS];
 int playerCount = 0;
+int zombie3X = 500;
+int zombie3Y = 600;
+int minnie3X = 168;
+int minnie3Y = 253;
+int floor1X = 168;
+int floor1Y = 253;
+int floor1width = 833;
+int floor2X = 69;
+int floor2Y = 365;
+int floor2width = 212;
+int floor3X = 296;
+int floor3Y = 389;
+int floor3width = 813;
+int floor4X = 687;
+int floor4Y = 655;
+int floor4width = 463;
+bool onfloor1 = false;
+bool onfloor2 = false;
+bool onfloor3 = false;
+bool onfloor4 = false;
+
 
 // int minnie_jump_idx=0;
 /*
 function iDraw() is called again and again by the system.
 */
 void loadLeaderboard();
+void changeZombiePosition();
 void load_image()
 {
     iLoadImage(&menu, "assets/images/My Game/Menu.jpg");
@@ -251,6 +273,38 @@ void iDraw()
                         }
                     }
                 }
+                 if( levels == 3)
+                {
+                    iSetColor(255, 255, 255);
+                    sprintf(timer, "Time Left: %d", timer3);
+                    sprintf(score, "Score: %d", scoreLeft);
+                    iShowImage(zombie3X, zombie3Y, zombie[zombie_idx]);
+                    if (show_diamond)
+                    {
+                        iShowImage(1030, 686, "assets/images/My Game/diamond.png");
+                    }
+                    iSetColor(255, 255, 255);
+                    iText(1000, 800, timer, GLUT_BITMAP_TIMES_ROMAN_24);
+                    iText(70, 800, score, GLUT_BITMAP_TIMES_ROMAN_24);
+                    if (isStanding)
+                    {
+                        iShowImage(minnie3X, minnie3Y + minnie_jump, minnie_jumping[0]);
+                    }
+
+                    else
+                    {
+                        if (isRunning)
+                        {
+                            iShowImage(minnie3X, minnie3Y + minnie_jump, minnie_running[minnie_running_idx]);
+                        }
+                        else if (isJumping)
+                        {
+                            isRunning = false;
+                            iShowImage(minnie3X, minnie3Y + minnie_jump, minnie_jumping[minnie_jumping_idx]);
+                        }
+                    }
+                }
+
                 if (gameOver)
                 {
                     iShowImage(0, 0, "assets/images/My Game/Game_over.jpg");
@@ -378,6 +432,26 @@ void timerUpdate()
         {
             timer3--;
         }
+        if (timer3 == 3)
+        {
+            iPlaySound("assets/sounds/timer.wav", false, 100);
+        }
+        gameOver = true;
+        if (!scoreSaved)
+        {
+            FILE *fcharacter_name = fopen("leaderboard.txt", "a");
+            if (fcharacter_name != NULL)
+            {
+                fprintf(fcharacter_name, "%d\n", scoreLeft);
+                fclose(fcharacter_name);
+            }
+            scoreSaved = true;
+        }
+        if (!soundPlayed)
+        {
+            iPlaySound("assets/sounds/over.wav", false, 100);
+            soundPlayed = 1;
+        }
     }
     if (levels == 4)
     {
@@ -400,6 +474,14 @@ void update_zombie()
     if (zombie_idx > 5)
     {
         zombie_idx = 0;
+    }
+}
+void changeZombiePosition()
+{
+        if (levels == 3 && !gameOver && !level_complete) {
+        zombie3X = rand() % 1120;
+        zombie3Y = rand() % 750;
+        printf("DEBUG: new zombie3X=%d Y=%d\n", zombie3X, zombie3Y);
     }
 }
 void platform_collision()
@@ -605,6 +687,60 @@ void platform_collision()
             onStage8 = false;
         }
     }
+    if (levels == 3)
+    {
+        int minnieFeetX1 = minnie3X;
+        int minnieFeetX2 = minnie3X + minnie_width;
+        int minnieFeetY = minnie3Y + minnie_jump;
+        if (minnieFeetX2 >= floor1X && minnieFeetX1 <= floor1X + floor1width)
+        {
+            if (minnieFeetY >= floor1Y - 5 && minnieFeetY <= stage1Y + 10 && !jumpUp)
+            {
+                onfloor1 = true;
+                onfloor2 = onfloor3 = onfloor4 = false;
+            }
+        }
+        else
+        {
+            onfloor1 = false;
+        }
+        if (minnieFeetX2 >= floor2X && minnieFeetX1 <= floor2X + floor2width)
+        {
+            if (minnieFeetY >= floor2Y + 24 - 5 && minnieFeetY <= floor2Y + 24 + 10 && !jumpUp)
+            {
+                onfloor2 = true;
+                onfloor1 = onfloor3 = onfloor4 = false;
+            }
+        }
+        else
+        {
+            onfloor2 = false;
+        }
+        if (minnieFeetX2 >= floor3X && minnieFeetX1 <= floor3X + floor3width)
+        {
+            if (minnieFeetY >= floor3Y - 5 && minnieFeetY <= floor3Y + 10 && !jumpUp)
+            {
+                onfloor3 = true;
+                onfloor2 = onfloor1 = onfloor4 = false;
+            }
+        }
+        else
+        {
+            onfloor3 = false;
+        }
+        if (minnieFeetX2 >= floor4X && minnieFeetX1 <= floor4X + floor4width)
+        {
+            if (minnieFeetY >= floor4Y - 5 && minnieFeetY <= stage4Y + 10 && !jumpUp)
+            {
+                onfloor4 = true;
+                onfloor2 = onfloor3 = onfloor1 = false;
+            }
+        }
+        else
+        {
+            onfloor4 = false;
+        }
+    }
 }
 void diamond_collect()
 {
@@ -632,6 +768,33 @@ void diamond_collect()
         if (minnie2X + minnie_width - 5 >= 1120 && minnie2X <= 1120 + diamond_width + 5)
         {
             if (minnie2Y + minnie_jump >= 534 - 20 && minnie2Y + minnie_jump <= 534 + diamond_height + 20)
+            {
+                level_complete = true;
+                if (!scoreSaved)
+                {
+                    FILE *fcharacter_name = fopen("leaderboard.txt", "a");
+                    if (fcharacter_name != NULL)
+                    {
+                        fprintf(fcharacter_name, "%d\n", scoreLeft);
+                        fclose(fcharacter_name);
+                    }
+                    scoreSaved = true;
+                }
+
+                show_diamond = false;
+                if (!soundPlayed)
+                {
+                    iPlaySound("assets/sounds/complete.wav", false, 100);
+                    soundPlayed = 1;
+                }
+            }
+        }
+    }
+    if (levels == 3)
+    {
+        if (minnie3X + minnie_width - 5 >= 1030 && minnie2X <= 1030 + diamond_width + 5)
+        {
+            if (minnie3Y + minnie_jump >= 686 - 20 && minnie3Y + minnie_jump <= 686 + diamond_height + 20)
             {
                 level_complete = true;
                 if (!scoreSaved)
@@ -1225,6 +1388,7 @@ int main(int argc, char *argv[])
 {
     glutInit(&argc, argv);
     load_image();
+    srand(time(NULL));
     iSetTimer(30, update_jump);
     iSetTimer(30, change_obstacle);
     iSetTimer(30, update_running);
@@ -1235,6 +1399,7 @@ int main(int argc, char *argv[])
     iSetTimer(20, portal_collisison);
     iSetTimer(30, diamond_collect);
     iSetTimer(160, update_zombie);
+    iSetTimer(1500, changeZombiePosition);
     // place your own initialization codes here.
     iInitializeSound();
     if (!gameOver && !level_complete)
