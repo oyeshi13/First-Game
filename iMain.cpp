@@ -2,7 +2,7 @@
 #include "iSound.h"
 #include <windows.h>
 #define MAX_PLAYERS 50
-int jumpLimit = 160;
+int jumpLimit = 360;
 int minnieHeight = 239;
 int minnieWidth = 187;
 int timer1 = 70;
@@ -145,7 +145,14 @@ bool onObstacle3 = false;
 int dx3 = 1;
 bool show_bomb = true;
 int scoreUpdated = 0;
-
+int bombY = 850;
+int bombX = 150;
+bool showbomb = false;
+int bomb_speed = 10;
+int bomb_drop_interval = 3000;
+int last_drop_time = 0;
+int screen_width = 1200;
+int screen_height = 850;
 /*
 function iDraw() is called again and again by the system.
 */
@@ -263,7 +270,7 @@ void iDraw()
                     }
                     iSetColor(255, 255, 255);
                     iText(1000, 800, timer, GLUT_BITMAP_TIMES_ROMAN_24);
-                    iText(70, 400, score, GLUT_BITMAP_TIMES_ROMAN_24);
+                    iText(70, 800, score, GLUT_BITMAP_TIMES_ROMAN_24);
 
                     // iShowImage(zombie2X, zombie2Y, zombie[zombie_idx]);
                     if (isStanding)
@@ -315,7 +322,6 @@ void iDraw()
                         }
                     }
                 }
-
                 if (gameOver)
                 {
                     iShowImage(0, 0, "assets/images/My Game/Game_over.jpg");
@@ -481,6 +487,20 @@ void changeZombiePosition()
         //printf("DEBUG: new zombie3X=%d Y=%d\n", zombie3X, zombie3Y);
     }
 }
+// void change_bomb_position()
+// {
+// //     bombX = rand() % screen_width;
+// //     bombY = screen_height;
+// //     show_bomb = true;
+// // }
+// // void bomb_drop()
+// // {
+//     if(levels == 3 && !gameOver && !level_complete)
+//     {
+//         bombX = rand() % screen_width;
+//         bombY -= 10;
+//     }
+// }
 void platform_collision()
 {
     if (levels == 1)
@@ -758,7 +778,7 @@ void platform_collision()
         }
         if (minnieFeetX2 >= floor4X && minnieFeetX1 <= floor4X + floor4width)
         {
-            if (minnieFeetY >= floor4Y - 5 && minnieFeetY <= stage4Y + 10 && !jumpUp)
+            if (minnieFeetY >= floor4Y - 20 && minnieFeetY <= floor4Y + 60 && !jumpUp)
             {
                 onfloor4 = true;
                 onfloor2 = onfloor3 = onfloor1 = false;
