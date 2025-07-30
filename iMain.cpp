@@ -181,6 +181,7 @@ void iDraw()
         {
             iShowImage(0, 0, "assets/images/My Game/player name.png");
             iSetColor(0, 0, 0);
+            
             iText(448, 455, current_player, GLUT_BITMAP_HELVETICA_18);
         }
         for (int i = 0; i <= 5; i++)
