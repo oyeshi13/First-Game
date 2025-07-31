@@ -2,7 +2,7 @@
 #include "iSound.h"
 #include <windows.h>
 #define MAX_PLAYERS 50
-int jumpLimit = 160;
+int jumpLimit = 360;
 int minnieHeight = 239;
 int minnieWidth = 187;
 int timer1 = 70;
@@ -312,6 +312,8 @@ void iDraw()
                 }
 
                 if (gameOver && !level_complete)
+
+        
                 {
                     iShowImage(0, 0, "assets/images/My Game/Game_over.jpg");
                 }
@@ -486,6 +488,20 @@ void changeZombiePosition()
         zombie3Y = rand() % 750;
     }
 }
+// void change_bomb_position()
+// {
+// //     bombX = rand() % screen_width;
+// //     bombY = screen_height;
+// //     show_bomb = true;
+// // }
+// // void bomb_drop()
+// // {
+//     if(levels == 3 && !gameOver && !level_complete)
+//     {
+//         bombX = rand() % screen_width;
+//         bombY -= 10;
+//     }
+// }
 void platform_collision()
 {
     if (levels == 1)

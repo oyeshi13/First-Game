@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 oyeshi	1354
 roza	1413
 roza	1431
@@ -22,3 +23,26 @@ oyeshi	1460
 1454
 1475
 1446
+=======
+882
+991
+959
+886
+903
+981
+981
+981
+1453
+1484
+ghjjhhj	1443
+ghfjgdjyhfgh	1406
+roza	1470
+roza	roza	roza	hjgj	1467
+hjgj	jhgjhgj	jhgjkgkj	jhgjkgkj	jhgjkgkj	jhbkhyugiuky	roza	1490
+roza	1485
+roza	1436
+roza	1448
+doja	roza	1436
+tata	1366
+ygfufy	1470
+>>>>>>> 45742ebdd03858f9c7238f9ba95c7b7804417a19
